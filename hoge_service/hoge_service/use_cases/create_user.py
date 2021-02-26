@@ -31,7 +31,6 @@ class OutputCreateUser(metaclass=ABCMeta):
 
 
 class CreateUser:
-
     def __init__(self, input_: InputCreateUser, output: OutputCreateUser) -> None:
         self.input_ = input_
         self.output = output

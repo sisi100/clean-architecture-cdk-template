@@ -11,7 +11,7 @@ from hoge_service.use_cases import CreateUser, InputCreateUser, OutputCreateUser
 logger = Logger()
 tracer = Tracer()
 
-# ==> O/I
+# ==> I/O
 
 
 class Input(InputCreateUser):

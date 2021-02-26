@@ -3,7 +3,8 @@ import boto3
 from hoge_service.entities import User
 from hoge_service.use_cases import CreateUser, InputCreateUser, OutputCreateUser
 
-# ==> O/I
+
+# ==> I/O
 
 
 class Input(InputCreateUser):
