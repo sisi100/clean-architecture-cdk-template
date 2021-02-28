@@ -31,3 +31,18 @@ $ make pytest
 $ cdk deploy --all
 ```
 
+## その他
+
+```
+# ローカルに作ったリソースの確認
+$ make list_resources
+
+# ローカルのテーブルスキャン
+$ make dynamo_scan:
+
+# ローカルのキュー確認
+$ make sqs_receive_messages:
+
+# ローカルのオブジェクト確認
+$ make s3_objects
+```
