@@ -1,11 +1,10 @@
-import os
 from typing import Dict
 
-import boto3
 from aws_lambda_powertools import Logger, Tracer
 
 from hoge_service.adapters.repos import DynamoDbRepo, S3Repo, SqsRepo
 from hoge_service.entities import User
+from hoge_service.settings import BUCKET_NAME, DYNAMO_RESOURCE, QUEUE_NAME, S3_RESOURCE, SQS_RESOURCE, TABLE_NAME
 from hoge_service.use_cases import CreateUser, InputCreateUser, OutputCreateUser
 
 # ==> I/O
@@ -48,8 +47,8 @@ logger = Logger()
 tracer = Tracer()
 
 
-@logger.inject_lambda_context(log_event=True)
-@tracer.capture_lambda_handler
+# @logger.inject_lambda_context(log_event=True)
+# @tracer.capture_lambda_handler
 def lambda_handler(event: Dict, context):
     """
     ハンドラーのサンプル
@@ -60,22 +59,13 @@ def lambda_handler(event: Dict, context):
     event={"pk": "12", "name":"テスト太郎", "age": 99}
     ```
     """
-
-    dynamo_resource = boto3.resource("dynamodb")
-    s3_resource = boto3.resource("s3")
-    sqs_resource = boto3.resource("sqs")
-
-    table_name = os.getenv("TABLE_NAME")
-    bucket_name = os.getenv("BUCKET_NAME")
-    queue_name = os.getenv("QUEUE_NAME")
-
     return Presenter(
         CreateUser(
             Input(
                 event=event,
-                db_repo=DynamoDbRepo(dynamo_resource, table_name),
-                storage_repo=S3Repo(s3_resource, bucket_name),
-                queue_repo=SqsRepo(sqs_resource, queue_name),
+                db_repo=DynamoDbRepo(DYNAMO_RESOURCE, TABLE_NAME),
+                storage_repo=S3Repo(S3_RESOURCE, BUCKET_NAME),
+                queue_repo=SqsRepo(SQS_RESOURCE, QUEUE_NAME),
             )
         )
     ).result()
