@@ -18,7 +18,6 @@ class HogeAppStack(core.Stack):
             tracing=Tracing.ACTIVE,
             layers=[infra.layer],
             environment={
-                "IS_CLOUD": True,
                 "TABLE_NAME": infra.table.table_name,
                 "BUCKET_NAME": infra.bucket.bucket_name,
                 "QUEUE_NAME": infra.queue.queue_name,
