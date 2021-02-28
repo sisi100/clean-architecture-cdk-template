@@ -48,7 +48,7 @@ tracer = Tracer()
 
 
 # @logger.inject_lambda_context(log_event=True)
-# @tracer.capture_lambda_handler
+@tracer.capture_lambda_handler
 def lambda_handler(event: Dict, context):
     """
     ハンドラーのサンプル
