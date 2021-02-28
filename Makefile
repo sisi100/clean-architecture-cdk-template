@@ -5,9 +5,6 @@ queue_name=fake-queue
 bucket_name=fake-bucket
 
 
-cdk-shell:
-	docker-compose run --rm $(CDK_SERVICE) /bin/bash
-
 localstack:
 	docker run --rm -p 4566:4566 -p 4571:4571 -e SERVICES=dynamodb,s3,sqs,lambda localstack/localstack
 
