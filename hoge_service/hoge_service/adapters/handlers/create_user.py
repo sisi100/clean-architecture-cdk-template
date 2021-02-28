@@ -8,34 +8,44 @@ from hoge_service.adapters.repos import DynamoDbRepo, S3Repo, SqsRepo
 from hoge_service.entities import User
 from hoge_service.use_cases import CreateUser, InputCreateUser, OutputCreateUser
 
-logger = Logger()
-tracer = Tracer()
-
 # ==> I/O
 
 
 class Input(InputCreateUser):
-    def __init__(self, db_repo: DynamoDbRepo, storage_repo: S3Repo, queue_repo: SqsRepo) -> None:
-        self.db_repo = db_repo
-        self.storage_repo = storage_repo
-        self.queue_repo = queue_repo
+    def __init__(self, event: Dict, db_repo: DynamoDbRepo, storage_repo: S3Repo, queue_repo: SqsRepo) -> None:
+        self._db_repo = db_repo
+        self._storage_repo = storage_repo
+        self._queue_repo = queue_repo
+        self._event = event
+
+    @property
+    def event(self):
+        return self._event
 
     def create_user(self, user: User):
-        return self.db_repo.create_user(user)
+        return self._db_repo.create_user(user)
 
     def save_to_storage(self, user: User):
-        return self.storage_repo.put_user(user, key=user.sk)
+        return self._storage_repo.put_user(user, key=user.sk)
 
     def enqueue_user(self, user: User):
-        return self.queue_repo.enqueue_user(user)
+        return self._queue_repo.enqueue_user(user)
 
 
-class Output(OutputCreateUser):
-    def result(self, user: User):
+class Presenter:
+    def __init__(self, use_case_output: OutputCreateUser) -> None:
+        self._use_case_output = use_case_output
+
+    def result(self) -> Dict:
+        user = self._use_case_output.execute()
         return user.to_dict()
 
 
 # ==> handler
+
+
+logger = Logger()
+tracer = Tracer()
 
 
 @logger.inject_lambda_context(log_event=True)
@@ -59,12 +69,13 @@ def lambda_handler(event: Dict, context):
     bucket_name = os.getenv("BUCKET_NAME")
     queue_name = os.getenv("QUEUE_NAME")
 
-    input_ = Input(
-        db_repo=DynamoDbRepo(dynamo_resource, table_name),
-        storage_repo=S3Repo(s3_resource, bucket_name),
-        queue_repo=SqsRepo(sqs_resource, queue_name),
-    )
-    output = Output()
-
-    use_case = CreateUser(input_=input_, output=output)
-    return use_case.execute(event)
+    return Presenter(
+        CreateUser(
+            Input(
+                event=event,
+                db_repo=DynamoDbRepo(dynamo_resource, table_name),
+                storage_repo=S3Repo(s3_resource, bucket_name),
+                queue_repo=SqsRepo(sqs_resource, queue_name),
+            )
+        )
+    ).result()
