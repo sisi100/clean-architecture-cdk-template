@@ -1,5 +1,5 @@
 aws-cdk.core==1.91.0
-aws-cdk.aws_s3==1.91.0
+aws-cdk.aws_s3==1.95.0
 aws-cdk.aws-lambda==1.91.0
 aws-cdk.aws_dynamodb==1.91.0
 
