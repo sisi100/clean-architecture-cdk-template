@@ -1,6 +1,6 @@
 aws-cdk.core==1.95.1
 aws-cdk.aws_s3==1.95.1
 aws-cdk.aws-lambda==1.95.1
-aws-cdk.aws_dynamodb==1.95.1
+aws-cdk.aws_dynamodb==1.120.0
 
 pytest==6.2.2
